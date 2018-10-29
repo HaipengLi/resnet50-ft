@@ -8,6 +8,7 @@ import torch.optim as optim
 
 NUM_EPOCH = 10
 SAVE_MODEL = 'trained.model'
+CUDA = True
 
 
 class ResNet50_CIFAR(nn.Module):
@@ -32,7 +33,7 @@ class ResNet50_CIFAR(nn.Module):
         out = self.dropout(out)
         return self.fc2(out)
 
-def train():
+def train(cuda=False):
     ## Define the training dataloader
     transform = transforms.Compose([transforms.Resize(224),
                                     transforms.ToTensor(),
@@ -46,6 +47,10 @@ def train():
 
     ## Create model, objective function and optimizer
     model = ResNet50_CIFAR()
+    if cuda:
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        model.to(device)
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(list(model.fc1.parameters()) + list(model.fc2.parameters()),
                            lr=0.001, momentum=0.9)
@@ -56,6 +61,9 @@ def train():
         for i, data in enumerate(trainloader, 0):
             # get the inputs
             inputs, labels = data
+            if cuda:
+                inputs, labels = inputs.to(device), labels.to(device)
+
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -79,4 +87,4 @@ def train():
 
 
 if __name__ == '__main__':
-    train()
+    train(cuda=CUDA)
