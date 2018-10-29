@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 
 NUM_EPOCH = 10
-SAVE_MODEL = 'trained.model'
+SAVE_MODEL = 'trained_epoch_{}.model'
 CUDA = True
 
 
@@ -82,9 +82,9 @@ def train(cuda=False):
                 print('[%d, %5d] loss: %.3f' %
                     (epoch + 1, i + 1, running_loss / 20))
                 running_loss = 0.0
+        torch.save(model.state_dict(), SAVE_MODEL.format(epoch + 1))
     print('Finished Training')
 
-    torch.save(model.state_dict(), SAVE_MODEL)
     # load
     # the_model = TheModelClass(*args, **kwargs)
     # the_model.load_state_dict(torch.load(PATH))
