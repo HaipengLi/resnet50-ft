@@ -1,0 +1,4 @@
+*.model
+data
+.idea
+.DS_Store
