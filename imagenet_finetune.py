@@ -4,6 +4,7 @@ import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import torch.optim as optim
+from tqdm import tqdm
 
 
 NUM_EPOCH = 10
@@ -33,6 +34,7 @@ class ResNet50_CIFAR(nn.Module):
         out = self.dropout(out)
         return self.fc2(out)
 
+
 def train(cuda=False):
     ## Define the training dataloader
     transform = transforms.Compose([transforms.Resize(224),
@@ -49,6 +51,7 @@ def train(cuda=False):
     model = ResNet50_CIFAR()
     if cuda:
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        print("Using devide: {}".format(device))
         model.to(device)
 
     criterion = nn.CrossEntropyLoss()
@@ -57,8 +60,9 @@ def train(cuda=False):
 
     ## Do the training
     for epoch in range(NUM_EPOCH):  # loop over the dataset multiple times
+        print("Training {}/{} epoch".format(epoch + 1, NUM_EPOCH))
         running_loss = 0.0
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(tqdm(trainloader, 0)):
             # get the inputs
             inputs, labels = data
             if cuda:
