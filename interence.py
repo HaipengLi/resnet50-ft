@@ -46,7 +46,7 @@ def inference_on_test(model, cuda, limit=0):
     testloader = dl.load_test_set()
     print("Start inference")
     loss, accuracy = inference(model, testloader, cuda=cuda, limit=limit)
-    print("Summary for {}".format(model))
+    print("Summary:")
     print("\tLoss: {}".format(loss))
     print("\tAccuracy: {}".format(accuracy))
     return loss, accuracy
