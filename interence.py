@@ -41,22 +41,22 @@ def inference(model, dataloader, cuda, limit=0):
     return loss, accuracy
 
 
-def inference_on_test(model, cuda):
+def inference_on_test(model, cuda, limit=0):
     dl = DataLoader()
     testloader = dl.load_test_set()
     print("Start inference")
-    loss, accuracy = inference(model, testloader, cuda=cuda)
+    loss, accuracy = inference(model, testloader, cuda=cuda, limit=limit)
     print("Summary for {}".format(model))
     print("\tLoss: {}".format(loss))
     print("\tAccuracy: {}".format(accuracy))
     return loss, accuracy
 
 
-def inference_on_train(model, cuda):
+def inference_on_train(model, cuda, limit=0):
     dl = DataLoader()
     trainloader = dl.load_train_set()
     print("Start inference")
-    loss, accuracy = inference(model, trainloader, cuda=cuda)
+    loss, accuracy = inference(model, trainloader, cuda=cuda, limit=limit)
     print("Summary for {}".format(model))
     print("\tLoss: {}".format(loss))
     print("\tAccuracy: {}".format(accuracy))
