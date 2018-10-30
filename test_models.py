@@ -24,10 +24,10 @@ if __name__ == '__main__':
     for model_name in model_list:
         print("testing on model: {}".format(model_name))
         model.load_state_dict(torch.load(model_name))
-        train_loss, train_accuracy = interence.inference_on_train(model, cuda=True, limit=20)
+        train_loss, train_accuracy = interence.inference_on_train(model, cuda=True, limit=1000)
         print("\ttrain_loss: {}".format(train_loss))
         print("\ttrain_accuracy: {}".format(train_accuracy))
-        test_loss, test_accuracy = interence.inference_on_test(model, cuda=True, limit=20)
+        test_loss, test_accuracy = interence.inference_on_test(model, cuda=True, limit=1000)
         print("\ttest_loss: {}".format(test_loss))
         print("\ttest_accuracy: {}".format(test_accuracy))
 
@@ -50,6 +50,7 @@ if __name__ == '__main__':
     plt.ylabel('Loss')
     plt.title('Loss of different epochs')
     plt.xlabel('Epoch')
+    plt.legend(['train', 'test'])
     plt.show()
 
     plt.figure()
@@ -59,4 +60,5 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.title('Accuracy of different epochs')
     plt.xlabel('Epoch')
+    plt.legend(['train', 'test'])
     plt.show()
