@@ -38,10 +38,15 @@ if __name__ == '__main__':
 
     with open("result.txt", 'w') as f:
         f.writelines(str(model_list))
+        f.write('\n')
         f.writelines(str(train_loss_list))
+        f.write('\n')
         f.writelines(str(test_loss_list))
+        f.write('\n')
         f.writelines(str(train_accuracy_list))
+        f.write('\n')
         f.writelines(str(test_accuracy_list))
+        f.write('\n')
 
     plt.figure()
     plt.plot(list(id_range), train_loss_list, label='train')
