@@ -57,7 +57,7 @@ def inference_on_train(model, cuda, limit=0):
     trainloader = dl.load_train_set()
     print("Start inference")
     loss, accuracy = inference(model, trainloader, cuda=cuda, limit=limit)
-    print("Summary for {}".format(model))
+    print("Summary:")
     print("\tLoss: {}".format(loss))
     print("\tAccuracy: {}".format(accuracy))
     return loss, accuracy
