@@ -1,9 +1,12 @@
 import torch
+import matplotlib.pyplot as plt
+import numpy as np
 import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import torch.optim as optim
 from resnet50cifar import ResNet50_CIFAR
+import interence
 from tqdm import tqdm
 import config
 
@@ -31,10 +34,10 @@ def train(cuda=False, num_epoch=10, save_file=''):
     optimizer = optim.SGD(list(model.fc1.parameters()) + list(model.fc2.parameters()),
                            lr=0.001, momentum=0.9)
 
-    train_accuracy = []
-    test_accuracy = []
-    train_loss = []
-    test_loss = []
+    train_loss_list = []
+    train_accuracy_list = []
+    test_loss_list = []
+    test_accuracy_list = []
 
     ## Do the training
     for epoch in range(num_epoch):  # loop over the dataset multiple times
@@ -55,21 +58,48 @@ def train(cuda=False, num_epoch=10, save_file=''):
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            running_loss += loss.item()
-            if i % 20 == 19:    # print every 20 mini-batches
-                print('[%d, %5d] loss: %.3f' %
-                    (epoch + 1, i + 1, running_loss / 20))
-                running_loss = 0.0
-        # TODO: using `inference.py`, print (accuracy, loss) for train and test set
-        print("Loss")
-        print("Loss for whole")
+
+            # running_loss += loss.item()
+            # if i % 20 == 19:    # print every 20 mini-batches
+            #     print('[%d, %5d] loss: %.3f' %
+            #         (epoch + 1, i + 1, running_loss / 20))
+            #     running_loss = 0.0
+
+        print("testing on training set..")
+        train_loss, train_accuracy = interence.inference_on_train(model, cuda=True, limit=1000)
+        print("testing on testing set..")
+        test_loss, test_accuracy = interence.inference_on_test(model, cuda=True, limit=1000)
+
+        train_loss_list.append(train_loss)
+        train_accuracy_list.append(train_accuracy)
+        test_loss_list.append(test_loss)
+        test_accuracy_list.append(test_accuracy)
+
         if save_file:
             torch.save(model.state_dict(), save_file.format(epoch + 1))
     print('Finished Training')
+    # find the best model
+    loss_np = np.add(train_loss_list, test_loss_list)
+    best_idx = np.argmin(loss_np)
+    print("Best model is in epoch {}".format(best_idx + 1))
 
-    # load
-    # the_model = TheModelClass(*args, **kwargs)
-    # the_model.load_state_dict(torch.load(PATH))
+    plt.figure()
+    plt.plot(list(range(1, num_epoch + 1)), train_loss_list, label='train')
+    plt.plot(list(range(1, num_epoch + 1)), test_loss_list, label='test')
+
+    plt.ylabel('Loss')
+    plt.title('Loss of different epochs')
+    plt.xlabel('Epoch')
+    plt.show()
+
+    plt.figure()
+    plt.plot(list(range(1, num_epoch + 1)), train_accuracy_list, label='train')
+    plt.plot(list(range(1, num_epoch + 1)), test_accuracy_list, label='test')
+
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy of different epochs')
+    plt.xlabel('Epoch')
+    plt.show()
 
 
 if __name__ == '__main__':

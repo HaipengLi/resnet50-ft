@@ -1,6 +1,7 @@
 import torch
 from resnet50cifar import ResNet50_CIFAR
 import interence
+import matplotlib.pyplot as plt
 
 
 # TODO: for each model, get loss / accuracy for train / test set
@@ -23,10 +24,10 @@ if __name__ == '__main__':
     for model_name in model_list:
         print("testing on model: {}".format(model_name))
         model.load_state_dict(torch.load(model_name))
-        train_loss, train_accuracy = interence.inference_on_train(model, cuda=True, limit=1000)
+        train_loss, train_accuracy = interence.inference_on_train(model, cuda=True, limit=20)
         print("\ttrain_loss: {}".format(train_loss))
         print("\ttrain_accuracy: {}".format(train_accuracy))
-        test_loss, test_accuracy = interence.inference_on_test(model, cuda=True, limit=1000)
+        test_loss, test_accuracy = interence.inference_on_test(model, cuda=True, limit=20)
         print("\ttest_loss: {}".format(test_loss))
         print("\ttest_accuracy: {}".format(test_accuracy))
 
@@ -36,8 +37,26 @@ if __name__ == '__main__':
         test_accuracy_list.append(test_accuracy)
 
     with open("result.txt", 'w') as f:
-        f.write(str(model_list))
-        f.write(str(train_loss_list))
-        f.write(str(train_accuracy_list))
-        f.write(str(test_loss_list))
-        f.write(str(test_accuracy_list))
+        f.writelines(str(model_list))
+        f.writelines(str(train_loss_list))
+        f.writelines(str(test_loss_list))
+        f.writelines(str(train_accuracy_list))
+        f.writelines(str(test_accuracy_list))
+
+    plt.figure()
+    plt.plot(list(id_range), train_loss_list, label='train')
+    plt.plot(list(id_range), test_loss_list, label='test')
+
+    plt.ylabel('Loss')
+    plt.title('Loss of different epochs')
+    plt.xlabel('Epoch')
+    plt.show()
+
+    plt.figure()
+    plt.plot(list(id_range), train_accuracy_list, label='train')
+    plt.plot(list(id_range), test_accuracy_list, label='test')
+
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy of different epochs')
+    plt.xlabel('Epoch')
+    plt.show()
