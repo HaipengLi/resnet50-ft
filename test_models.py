@@ -31,10 +31,10 @@ if __name__ == '__main__':
         print("\ttest_loss: {}".format(test_loss))
         print("\ttest_accuracy: {}".format(test_accuracy))
 
-        train_loss_list.append(train_loss)
-        train_accuracy_list.append(train_accuracy)
-        test_loss_list.append(test_loss)
-        test_accuracy_list.append(test_accuracy)
+        train_loss_list.append(float(train_loss))
+        train_accuracy_list.append(float(train_accuracy))
+        test_loss_list.append(float(test_loss))
+        test_accuracy_list.append(float(test_accuracy))
 
     with open("result.txt", 'w') as f:
         f.writelines(str(model_list))
