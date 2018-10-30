@@ -1,41 +1,14 @@
 import torch
-import torchvision.models as models
 import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import torch.optim as optim
+from resnet50cifar import ResNet50_CIFAR
 from tqdm import tqdm
+import config
 
 
-NUM_EPOCH = 10
-SAVE_MODEL = 'trained_epoch_{}.model'
-CUDA = True
-
-
-class ResNet50_CIFAR(nn.Module):
-    def __init__(self):
-        super(ResNet50_CIFAR, self).__init__()
-        # Initialize ResNet 50 with ImageNet weights
-        ResNet50 = models.resnet50(pretrained=True)
-        modules = list(ResNet50.children())[:-1]
-        backbone = nn.Sequential(*modules)
-        # Create new layers
-        self.backbone = nn.Sequential(*modules)
-        self.fc1 = nn.Linear(2048, 32)
-        self.dropout = nn.Dropout(p=0.5)
-        self.fc2 = nn.Linear(32, 10)
-
-    def forward(self, img):
-        # Get the flattened vector from the backbone of resnet50
-        out = self.backbone(img)
-        # processing the vector with the added new layers
-        out = out.view(out.size(0), -1)
-        out = self.fc1(out)
-        out = self.dropout(out)
-        return self.fc2(out)
-
-
-def train(cuda=False):
+def train(cuda=False, num_epoch=10, save_file=''):
     ## Define the training dataloader
     transform = transforms.Compose([transforms.Resize(224),
                                     transforms.ToTensor(),
@@ -58,9 +31,14 @@ def train(cuda=False):
     optimizer = optim.SGD(list(model.fc1.parameters()) + list(model.fc2.parameters()),
                            lr=0.001, momentum=0.9)
 
+    train_accuracy = []
+    test_accuracy = []
+    train_loss = []
+    test_loss = []
+
     ## Do the training
-    for epoch in range(NUM_EPOCH):  # loop over the dataset multiple times
-        print("Training {}/{} epoch".format(epoch + 1, NUM_EPOCH))
+    for epoch in range(num_epoch):  # loop over the dataset multiple times
+        print("Training {}/{} epoch".format(epoch + 1, num_epoch))
         running_loss = 0.0
         for i, data in enumerate(tqdm(trainloader, 0)):
             # get the inputs
@@ -82,7 +60,11 @@ def train(cuda=False):
                 print('[%d, %5d] loss: %.3f' %
                     (epoch + 1, i + 1, running_loss / 20))
                 running_loss = 0.0
-        torch.save(model.state_dict(), SAVE_MODEL.format(epoch + 1))
+        # TODO: using `inference.py`, print (accuracy, loss) for train and test set
+        print("Loss")
+        print("Loss for whole")
+        if save_file:
+            torch.save(model.state_dict(), save_file.format(epoch + 1))
     print('Finished Training')
 
     # load
@@ -91,4 +73,4 @@ def train(cuda=False):
 
 
 if __name__ == '__main__':
-    train(cuda=CUDA)
+    train(cuda=config.CUDA, num_epoch=config.NUM_EPOCH, save_file=config.SAVE_FILE)
